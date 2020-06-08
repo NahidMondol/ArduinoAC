@@ -1,0 +1,32 @@
+#include<LiquidCrystal.h>
+
+// Set up lcd with assigned GPIO pins
+LiquidCrystal lcd(4,5,8,9,10,11);
+
+// Store requested temp and current temp
+// Current temp is a fixed variable for now
+int requestedTemp = 50;
+int currentTemp = 78;
+
+void setup() {
+  Serial.begin(9600);
+  // 16x2 display
+  lcd.begin(16,2);
+}
+
+void loop() {
+  setLCD();
+}
+
+// Sets the lcd screen to show the requested temp on the first row
+// and the current temp to the bottom row of the lcd
+void setLCD()
+{
+  lcd.setCursor(1,0);
+  lcd.print("Req Temp: ");
+  lcd.print(requestedTemp);
+
+  lcd.setCursor(1,2);
+  lcd.print("Cur Temp: ");
+  lcd.print(currentTemp);
+}
