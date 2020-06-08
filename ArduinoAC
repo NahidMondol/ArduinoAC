@@ -1,0 +1,57 @@
+#include<LiquidCrystal.h>
+
+// designated I/O pins for arduino
+const int tempUp = 2;
+const int tempDown = 3;
+LiquidCrystal lcd(4,5,8,9,10,11);
+
+
+// Store requested temp and current temp
+// Current temp is a fixed variable for now
+int requestedTemp = 50;
+int currentTemp = 78;
+
+void setup() {
+  Serial.begin(9600);
+  // Assign components
+  pinMode(tempUp, INPUT);
+  pinMode(tempDown, INPUT);
+  // 16x2 display
+  lcd.begin(16,2);
+}
+
+void loop() {
+  changeTemp();
+  setLCD();
+}
+
+
+// Change the requested tempurature by pressing a button on the breadboard
+void changeTemp()
+{
+  if(digitalRead(tempUp) == HIGH)
+    {
+      delay(250);
+      requestedTemp++;
+    }
+    if(digitalRead(tempDown) == HIGH)
+    {
+      delay(250);
+      requestedTemp--;
+    }
+}
+
+// Sets the lcd screen to show the requested temp on the first row
+// and the current temp to the bottom row of the lcd
+void setLCD()
+{
+  // First Row
+  lcd.setCursor(1,0);
+  lcd.print("Req Temp: ");
+  lcd.print(requestedTemp);
+
+  // Second Row
+  lcd.setCursor(1,2);
+  lcd.print("Cur Temp: ");
+  lcd.print(78);
+}
