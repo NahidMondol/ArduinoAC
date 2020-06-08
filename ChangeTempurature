@@ -1,0 +1,32 @@
+const int tempUp = 2;
+const int tempDown = 3;
+
+// Placeholder for current room tempurature
+int requestedTemp = 50;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(tempUp, INPUT);
+  pinMode(tempDown, INPUT);
+
+}
+
+void loop() {
+  changeTemp();
+  Serial.println(requestedTemp);
+}
+
+// Change the requested tempurature by pressing a button on the breadboard
+void changeTemp()
+{
+  if(digitalRead(tempUp) == HIGH)
+    {
+      delay(500); // Small delay so button taps dont dramatically change the tempurature
+      requestedTemp++;
+    }
+    if(digitalRead(tempDown) == HIGH)
+    {
+      delay(500); // Small delay so button taps dont dramatically change the tempurature
+      requestedTemp--;
+    }
+}
