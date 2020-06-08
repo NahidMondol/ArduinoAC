@@ -1,7 +1,8 @@
+// designated I/O pins for arduino
 const int tempUp = 2;
 const int tempDown = 3;
 
-// Placeholder for current room tempurature
+// Placeholder for requested room tempurature
 int requestedTemp = 50;
 
 void setup() {
