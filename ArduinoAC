@@ -69,7 +69,7 @@ int currentTemp(double resistance, double a, double b, double c)
   temp = temp - 273.15;
   if(farOverCelsius)
   {
-    temp = (temp * 9.0)/ 5.0 + 32.0;
+    temp = (temp * 9.0) / 5.0 + 32.0;
   }
   
   return temp;
