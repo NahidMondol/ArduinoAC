@@ -14,12 +14,12 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(steinAndHartTemp(resistance, a, b, c));
+  Serial.println(currentTemp(resistance, a, b, c));
   delay(500);
 }
 
 // https://en.wikipedia.org/wiki/Steinhart%E2%80%93Hart_equation
-double steinAndHartTemp(double resistance, double a, double b, double c)
+double currentTemp(double resistance, double a, double b, double c)
 {
   double Vo, temp;
   
@@ -27,7 +27,7 @@ double steinAndHartTemp(double resistance, double a, double b, double c)
   resistance = (resistance * ((1023.0 / Vo) - 1.0));
   temp = ( (1.0) / ( (a) + (b * log(resistance)) + (c * (pow(log(resistance), 3))) ) );
   temp = temp - 273.15;
-  temp = (temp * 9.0)/ 5.0 + 32.0; 
+  temp = (temp * 9.0)/ 5.0 + 32.0; // Remove this line for celsius
 
   return temp;
 }
