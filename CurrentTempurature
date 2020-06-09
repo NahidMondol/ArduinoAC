@@ -1,0 +1,33 @@
+#include<Math.h>
+
+// Tempurature sensor GPIO
+int tempSensor = A0;
+
+// Values needed for Stein & Hart Equation
+double resistance = 10000;
+double a = 1.009249522e-03, b = 2.378405444e-04, c = 2.019202697e-07;
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(tempSensor, INPUT);
+}
+
+void loop() {
+  Serial.println(steinAndHartTemp(resistance, a, b, c));
+  delay(500);
+}
+
+// https://en.wikipedia.org/wiki/Steinhart%E2%80%93Hart_equation
+double steinAndHartTemp(double resistance, double a, double b, double c)
+{
+  double Vo, temp;
+  
+  Vo = analogRead(tempSensor);
+  resistance = (resistance * ((1023.0 / Vo) - 1.0));
+  temp = ( (1.0) / ( (a) + (b * log(resistance)) + (c * (pow(log(resistance), 3))) ) );
+  temp = temp - 273.15;
+  temp = (temp * 9.0)/ 5.0 + 32.0; 
+
+  return temp;
+}
