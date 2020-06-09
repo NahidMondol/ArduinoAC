@@ -3,28 +3,43 @@
 // designated I/O pins for arduino
 const int tempUp = 2;
 const int tempDown = 3;
+int tempSensor = A0;
 LiquidCrystal lcd(4,5,8,9,10,11);
 
+int *initialTemp;
+int requestedTemp, curTemp;
+const char degreeSymbol = char(223);
 
-// Store requested temp and current temp
-// Current temp is a fixed variable for now
-int requestedTemp = 50;
-int currentTemp = 78;
+// Values needed for Stein & Hart Equation
+double resistance = 10000;
+double a = 1.009249522e-03, b = 2.378405444e-04, c = 2.019202697e-07;
+
+// TRUE FOR FAHRENHEIT
+// FALSE FOR CELSIUS
+boolean farOverCelsius = true;
 
 void setup() {
   Serial.begin(9600);
   // Assign components
   pinMode(tempUp, INPUT);
   pinMode(tempDown, INPUT);
+  pinMode(tempSensor, INPUT);
   // 16x2 display
   lcd.begin(16,2);
+
+  // Set the initial tempurature to the current tempurature when starting
+  // up the program
+  curTemp = currentTemp(resistance, a, b, c);
+  initialTemp = &curTemp;
+  requestedTemp = *initialTemp;
 }
 
 void loop() {
-  changeTemp();
-  setLCD();
-}
+  curTemp = currentTemp(resistance, a, b, c);
 
+  changeTemp();
+  setLCD(curTemp);
+}
 
 // Change the requested tempurature by pressing a button on the breadboard
 void changeTemp()
@@ -41,17 +56,48 @@ void changeTemp()
     }
 }
 
+
+// https://en.wikipedia.org/wiki/Steinhart%E2%80%93Hart_equation
+// Set return type as double if needed
+int currentTemp(double resistance, double a, double b, double c)
+{
+  double Vo, temp;
+  
+  Vo = analogRead(tempSensor);
+  resistance = (resistance * ((1023.0 / Vo) - 1.0));
+  temp = ( (1.0) / ( (a) + (b * log(resistance)) + (c * (pow(log(resistance), 3))) ) );
+  temp = temp - 273.15;
+  if(farOverCelsius)
+  {
+    temp = (temp * 9.0)/ 5.0 + 32.0; // Remove this line for celsius
+  }
+  
+  return temp;
+}
+
 // Sets the lcd screen to show the requested temp on the first row
 // and the current temp to the bottom row of the lcd
-void setLCD()
+void setLCD(int curTemp)
 {
   // First Row
   lcd.setCursor(1,0);
   lcd.print("Req Temp: ");
   lcd.print(requestedTemp);
-
+  lcd.print(degreeSymbol);
+  switch(farOverCelsius)
+  {
+    case true: lcd.print("F"); break;
+    case false: lcd.print("C"); break;
+  }
+  
   // Second Row
   lcd.setCursor(1,2);
   lcd.print("Cur Temp: ");
-  lcd.print(78);
+  lcd.print(curTemp);
+  lcd.print(degreeSymbol);
+  switch(farOverCelsius)
+  {
+    case true: lcd.print("F"); break;
+    case false: lcd.print("C"); break;
+  }
 }
