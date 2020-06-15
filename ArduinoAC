@@ -16,7 +16,7 @@ double a = 1.009249522e-03, b = 2.378405444e-04, c = 2.019202697e-07;
 
 // TRUE FOR FAHRENHEIT
 // FALSE FOR CELSIUS
-boolean farOverCelsius = true;
+boolean fahrOverCelsius = true;
 
 void setup() {
   Serial.begin(9600);
@@ -67,7 +67,7 @@ int currentTemp(double resistance, double a, double b, double c)
   resistance = (resistance * ((1023.0 / Vo) - 1.0));
   temp = ( (1.0) / ( (a) + (b * log(resistance)) + (c * (pow(log(resistance), 3))) ) );
   temp = temp - 273.15;
-  if(farOverCelsius)
+  if(fahrOverCelsius)
   {
     temp = (temp * 9.0) / 5.0 + 32.0;
   }
@@ -84,7 +84,7 @@ void setLCD(int curTemp)
   lcd.print("Req Temp: ");
   lcd.print(requestedTemp);
   lcd.print(degreeSymbol);
-  switch(farOverCelsius)
+  switch(fahrOverCelsius)
   {
     case true: lcd.print("F"); break;
     case false: lcd.print("C"); break;
@@ -95,7 +95,7 @@ void setLCD(int curTemp)
   lcd.print("Cur Temp: ");
   lcd.print(curTemp);
   lcd.print(degreeSymbol);
-  switch(farOverCelsius)
+  switch(fahrOverCelsius)
   {
     case true: lcd.print("F"); break;
     case false: lcd.print("C"); break;
