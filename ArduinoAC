@@ -3,6 +3,7 @@
 // designated I/O pins for arduino
 const int tempUp = 2;
 const int tempDown = 3;
+const int fan = 6;
 int tempSensor = A0;
 LiquidCrystal lcd(4,5,8,9,10,11);
 
@@ -14,6 +15,9 @@ const char degreeSymbol = char(223);
 double resistance = 10000;
 double a = 1.009249522e-03, b = 2.378405444e-04, c = 2.019202697e-07;
 
+// Set tempurature clearances when activating the fan
+int clearanceF = 3, clearanceC = 1, clearance;
+
 // TRUE FOR FAHRENHEIT
 // FALSE FOR CELSIUS
 boolean fahrOverCelsius = true;
@@ -24,19 +28,24 @@ void setup() {
   pinMode(tempUp, INPUT);
   pinMode(tempDown, INPUT);
   pinMode(tempSensor, INPUT);
+  pinMode(fan, OUTPUT);
   // 16x2 display
   lcd.begin(16,2);
 
+  digitalWrite(fan, HIGH);
   // Set the initial tempurature to the current tempurature when starting
   // up the program
   curTemp = currentTemp(resistance, a, b, c);
   initialTemp = &curTemp;
   requestedTemp = *initialTemp;
+
+  setFanClearance(fahrOverCelsius);
 }
 
 void loop() {
   curTemp = currentTemp(resistance, a, b, c);
-
+  
+  fanIntakeState(curTemp, requestedTemp, clearance);
   changeTemp();
   setLCD(curTemp);
 }
@@ -69,7 +78,7 @@ int currentTemp(double resistance, double a, double b, double c)
   temp = temp - 273.15;
   if(fahrOverCelsius)
   {
-    temp = (temp * 9.0) / 5.0 + 32.0;
+    temp = (temp * 9.0)/ 5.0 + 32.0;
   }
   
   return temp;
@@ -99,5 +108,30 @@ void setLCD(int curTemp)
   {
     case true: lcd.print("F"); break;
     case false: lcd.print("C"); break;
+  }
+}
+
+// Set whether the intake fan is active or inactive based on
+// current tempurature and requested tempurature
+void fanIntakeState(int curTemp, int requestedTemp, int clearance)
+{
+  if(curTemp - clearance >= requestedTemp)
+  {
+    digitalWrite(fan, HIGH);
+  }
+  else
+  {
+    digitalWrite(fan, LOW);
+  }
+}
+
+// If the mode is set as celsius, change the
+// clearance tempurature before the fan turns on
+void setFanClearance(boolean fahrOverCelsius)
+{
+  switch(fahrOverCelsius)
+  {
+    case true: clearance = clearanceF; break;
+    case false: clearance = clearanceC; break;
   }
 }
