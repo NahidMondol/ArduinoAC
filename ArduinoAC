@@ -1,11 +1,12 @@
 #include<LiquidCrystal.h>
 
 // designated I/O pins for arduino
-const int tempUp = 2;
-const int tempDown = 3;
-const int fan = 6;
+const int tempUp = 8;
+const int tempDown = 9;
+const int inFan = 10;
+const int outFan = 11;
 int tempSensor = A0;
-LiquidCrystal lcd(4,5,8,9,10,11);
+LiquidCrystal lcd(2,3,4,5,6,7);
 
 int *initialTemp;
 int requestedTemp, curTemp;
@@ -28,11 +29,11 @@ void setup() {
   pinMode(tempUp, INPUT);
   pinMode(tempDown, INPUT);
   pinMode(tempSensor, INPUT);
-  pinMode(fan, OUTPUT);
-  // 16x2 display
+  pinMode(inFan, OUTPUT);
+  pinMode(outFan, OUTPUT);
+  // 16x2 display 
   lcd.begin(16,2);
 
-  digitalWrite(fan, HIGH);
   // Set the initial tempurature to the current tempurature when starting
   // up the program
   curTemp = currentTemp(resistance, a, b, c);
@@ -44,8 +45,9 @@ void setup() {
 
 void loop() {
   curTemp = currentTemp(resistance, a, b, c);
-  
   fanIntakeState(curTemp, requestedTemp, clearance);
+
+  digitalWrite(outFan, HIGH);
   changeTemp();
   setLCD(curTemp);
 }
@@ -117,11 +119,11 @@ void fanIntakeState(int curTemp, int requestedTemp, int clearance)
 {
   if(curTemp - clearance >= requestedTemp)
   {
-    digitalWrite(fan, HIGH);
+    digitalWrite(inFan, HIGH);
   }
   else
   {
-    digitalWrite(fan, LOW);
+    digitalWrite(inFan, LOW);
   }
 }
 
