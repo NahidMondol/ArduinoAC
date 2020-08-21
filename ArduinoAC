@@ -10,6 +10,7 @@ LiquidCrystal lcd(2,3,4,5,6,7);
 
 int *initialTemp;
 int requestedTemp, curTemp;
+int currentMilli;
 const char degreeSymbol = char(223);
 
 // Values needed for Stein & Hart Equation
@@ -23,7 +24,8 @@ int clearanceF = 3, clearanceC = 1, clearance;
 // FALSE FOR CELSIUS
 boolean fahrOverCelsius = true;
 
-void setup() {
+void setup()
+{
   Serial.begin(9600);
   // Assign components
   pinMode(tempUp, INPUT);
@@ -43,11 +45,12 @@ void setup() {
   setFanClearance(fahrOverCelsius);
 }
 
-void loop() {
+void loop()
+{
   curTemp = currentTemp(resistance, a, b, c);
   fanIntakeState(curTemp, requestedTemp, clearance);
 
-  digitalWrite(outFan, HIGH);
+  currentMilli = millis();
   changeTemp();
   setLCD(curTemp);
 }
@@ -104,12 +107,14 @@ void setLCD(int curTemp)
   // Second Row
   lcd.setCursor(1,2);
   lcd.print("Cur Temp: ");
-  lcd.print(curTemp);
-  lcd.print(degreeSymbol);
-  switch(fahrOverCelsius)
-  {
-    case true: lcd.print("F"); break;
-    case false: lcd.print("C"); break;
+  if(currentMilli % 500 == 0) {
+    lcd.print(curTemp);
+    lcd.print(degreeSymbol);
+     switch(fahrOverCelsius)
+     {
+      case true: lcd.print("F"); break;
+      case false: lcd.print("C"); break;
+    }
   }
 }
 
@@ -120,10 +125,12 @@ void fanIntakeState(int curTemp, int requestedTemp, int clearance)
   if(curTemp - clearance >= requestedTemp)
   {
     digitalWrite(inFan, HIGH);
+    digitalWrite(outFan, HIGH);
   }
   else
   {
     digitalWrite(inFan, LOW);
+    digitalWrite(outFan, LOW);
   }
 }
 
